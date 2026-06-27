@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRAL FC • VRFS Elite</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #00f5ff;
+            --accent: #ff00aa;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #0a001f;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .stars, .nebula {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            pointer-events: none;
+        }
+        .stars {
+            background: radial-gradient(circle at 25% 30%, rgba(255,255,255,0.8) 1px, transparent 2px),
+                        radial-gradient(circle at 75% 60%, rgba(255,255,255,0.7) 1px, transparent 2px),
+                        linear-gradient(180deg, #0a001f 0%, #1a0033 100%);
+            background-size: 200% 200%;
+            animation: starTwinkle 25s linear infinite;
+        }
+        .nebula {
+            background: radial-gradient(circle at 30% 40%, rgba(0, 245, 255, 0.15) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(255, 0, 170, 0.12) 0%, transparent 70%);
+            animation: nebulaDrift 120s ease infinite;
+        }
+        
+        @keyframes starTwinkle { 0% {background-position:0% 0%} 100%{background-position:200% 200%} }
+        @keyframes nebulaDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+        
+        header {
+            background: rgba(10,0,31,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2.5rem;
+            padding: 3rem 8%;
+        }
+        
+        .player-card {
+            background: rgba(20,5,50,0.75);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-15px) scale(1.04);
+            box-shadow: 0 25px 50px rgba(0,245,255,0.4);
+        }
+        
+        .player-header {
+            height: 240px;
+            background: linear-gradient(135deg, #1a0033, #003344);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .ovr-circle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--accent);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.1rem;
+            font-weight: bold;
+            width: 78px; height: 78px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+            box-shadow: 0 0 25px var(--accent);
+        }
+        
+        .player-avatar {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 5px solid var(--primary);
+            margin-top: 30px;
+        }
+        
+        .card-info {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .player-name { font-size: 1.65rem; font-weight: bold; margin: 10px 0 5px; }
+        .player-pos { color: var(--accent); font-size: 1.15rem; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10,0,31,0.97);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: rgba(20,5,50,0.98);
+            max-width: 620px;
+            width: 92%;
+            border-radius: 22px;
+            border: 3px solid var(--primary);
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="nebula"></div>
+
+    <header>
+        <div class="logo">ASTRAL FC</div>
+    </header>
+
+    <section>
+        <h2 style="text-align:center; font-family:'Orbitron',sans-serif; font-size:3rem; margin:2rem 0;">THE ROSTER</h2>
+        
+        <input type="text" id="searchInput" 
+               style="display:block;margin:0 auto 3rem;width:90%;max-width:700px;padding:18px 30px;font-size:1.2rem;border:3px solid var(--primary);border-radius:60px;background:rgba(10,0,31,0.7);color:white;" 
+               placeholder="Search players...">
+
+        <div id="playersGrid" class="players-grid"></div>
+    </section>
+
+    <!-- Player Detail Modal -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ====================== EASY TO CUSTOMIZE SECTION ======================
+        // Edit these 3 players directly. Add more objects if needed later.
+        let players = [
+            {
+                name: "NovaStriker",
+                vrfsId: "VRFS-77419",
+                position: "ST",
+                ovr: 92,
+                shooting: 94,
+                passing: 81,
+                description: "Explosive striker with lethal long-range shots and clinical finishing in VRFS.",
+                avatar: "https://picsum.photos/id/64/300/300"
+            },
+            {
+                name: "VoidKeeper",
+                vrfsId: "VRFS-29147",
+                position: "GK",
+                ovr: 88,
+                shooting: 45,
+                passing: 76,
+                description: "Unbreakable last line of defense. Elite shot-stopper and playmaker from the back.",
+                avatar: "https://picsum.photos/id/201/300/300"
+            },
+            {
+                name: "NebulaMid",
+                vrfsId: "VRFS-55602",
+                position: "CM",
+                ovr: 89,
+                shooting: 78,
+                passing: 93,
+                description: "Creative midfielder who controls the flow of the game with pinpoint passes.",
+                avatar: "https://picsum.photos/id/1005/300/300"
+            }
+        ];
+        // =======================================================================
+
+        function renderPlayers(list) {
+            const grid = document.getElementById('playersGrid');
+            grid.innerHTML = '';
+            
+            list.forEach(player => {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                card.innerHTML = `
+                    <div class="player-header">
+                        <div class="ovr-circle">${player.ovr}</div>
+                        <img src="${player.avatar}" class="player-avatar" alt="${player.name}">
+                    </div>
+                    <div class="card-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-pos">${player.position} • ${player.vrfsId}</div>
+                    </div>
+                `;
+                card.onclick = () => showModal(player);
+                grid.appendChild(card);
+            });
+        }
+
+        function showModal(p) {
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <h2 style="text-align:center;margin-bottom:0.5rem;">${p.name}</h2>
+                <p style="text-align:center;color:var(--accent);font-size:1.4rem;margin-bottom:1.5rem;">${p.position} — OVR ${p.ovr}</p>
+                
+                <p style="line-height:1.7;margin-bottom:2rem;">${p.description}</p>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div style="background:rgba(0,245,255,0.1);padding:20px;border-radius:12px;text-align:center;">
+                        <strong>Shooting</strong><br>
+                        <span style="font-size:2.6rem;color:var(--primary);">${p.shooting}</span>
+                    </div>
+                    <div style="background:rgba(0,245,255,0.1);padding:20px;border-radius:12px;text-align:center;">
+                        <strong>Passing</strong><br>
+                        <span style="font-size:2.6rem;color:var(--primary);">${p.passing}</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('playerModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('playerModal').style.display = 'none';
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', e => {
+            const term = e.target.value.toLowerCase().trim();
+            const filtered = players.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                p.position.toLowerCase().includes(term) ||
+                p.vrfsId.toLowerCase().includes(term)
+            );
+            renderPlayers(filtered);
+        });
+
+        // Initialize
+        window.onload = () => {
+            renderPlayers(players);
+        };
+    </script>
+</body>
+</html>
